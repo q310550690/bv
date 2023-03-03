@@ -44,25 +44,12 @@ jobs:
         with:
           path: app/build/outputs/apk/release/output-metadata.json
 
-      - name: Read debug apk output metadata
-        id: apk-meta-debug
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: app/build/outputs/apk/debug/output-metadata.json
-
       - name: Parse release info
         id: release-info
         run: |
           echo "release_info_version_code=${{ fromJson(steps.apk-meta-release.outputs.content).elements[0].versionCode }}" >> $GITHUB_ENV
           echo "release_info_version_name=${{ fromJson(steps.apk-meta-release.outputs.content).elements[0].versionName }}" >> $GITHUB_ENV
           echo "release_info_apk_filename=${{ fromJson(steps.apk-meta-release.outputs.content).elements[0].outputFile }}" >> $GITHUB_ENV
-
-      - name: Parse debug info
-        id: debug-info
-        run: |
-          echo "debug_info_version_code=${{ fromJson(steps.apk-meta-debug.outputs.content).elements[0].versionCode }}" >> $GITHUB_ENV
-          echo "debug_info_version_name=${{ fromJson(steps.apk-meta-debug.outputs.content).elements[0].versionName }}" >> $GITHUB_ENV
-          echo "debug_info_apk_filename=${{ fromJson(steps.apk-meta-debug.outputs.content).elements[0].outputFile }}" >> $GITHUB_ENV
 
       - name: Get current time
         id: date
@@ -73,24 +60,6 @@ jobs:
         with:
           files: app/build/outputs
           dest: BV_${{ env.release_info_version_code }}_${{ env.release_info_version_name }}_${{ env.current_time }}.zip
-
-      - name: Upload release outputs
-        uses: Difegue/action-megacmd@1.2.0
-        with:
-          args: put BV_${{ env.release_info_version_code }}_${{ env.release_info_version_name }}_${{ env.current_time }}.zip
-        env:
-          USERNAME: ${{ secrets.MEGA_USERNAME }}
-          PASSWORD: ${{ secrets.MEGA_PASSWORD }}
-
-      - name: Upload release apk to app center
-        uses: wzieba/AppCenter-Github-Action@v1.3.3
-        with:
-          appName: aaa1115910-gmail.com/BV
-          token: ${{secrets.APP_CENTER_TOKEN}}
-          group: Public
-          file: app/build/outputs/apk/release/${{ env.release_info_apk_filename }}
-          notifyTesters: true
-          debug: false
 
       - name: Archive release build artifacts
         uses: actions/upload-artifact@v3
@@ -103,9 +72,3 @@ jobs:
         with:
           name: Release build mappings
           path: app/build/outputs/mapping/release
-
-      - name: Archive debug build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Debug build artifact
-          path: app/build/outputs/apk/debug/${{ env.debug_info_apk_filename }}
