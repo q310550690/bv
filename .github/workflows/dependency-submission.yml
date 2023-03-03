@@ -3,7 +3,7 @@ name: Gradle Dependency Submission
 on:
   push:
     branches:
-      - develop
+      - magic
 
 jobs:
   gradle-action-detection:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: develop
+          ref: magic
 
       - name: Gradle dependency submission
         uses: mikepenz/gradle-dependency-submission@v0.8.4
