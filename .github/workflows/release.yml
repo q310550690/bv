@@ -36,7 +36,7 @@ jobs:
           base64 -d encoded_key > key.jks
 
       - name: Build apk
-        run: ./gradlew assembleRelease assembleDebug
+        run: ./gradlew assembleRelease
 
       - name: Read release apk output metadata
         id: apk-meta-release
